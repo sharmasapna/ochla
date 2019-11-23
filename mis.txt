@@ -1,0 +1,61 @@
+CLEA
+SET SAFETY OFF
+**********************
+***program to calculate average efficiency during the month**
+**********************
+AA="OChhst     "
+@5,3 SAY "ENTER NAME OF MONTH FOR WHICH MIS IS TO BE PREPARED:"  GET AA
+READ
+USE MS2
+ZAP
+APPE  FROM &AA FOR "12 H"$TIME
+D2=DATE
+GO TOP
+D1=DATE
+count for "OATX1"$NFSC TO A1
+count for "OCTXL"$NFSC TO A2
+count for "OC7GPR"$NFSC TO A3
+count for "OC7RSN"$NFSC TO A4
+count for "OC7TAX"$NFSC TO A5
+
+SUM FE for "OATX1"$NFSC TO B1
+sUM FE for "OCTXL"$NFSC TO B2
+SUM FE for "OC7GPR"$NFSC TO B3
+sUM FE for "OC7RSN"$NFSC TO B4
+SUM FE for "OC7TAX"$NFSC TO B5
+
+SUM FP for "OATX1"$NFSC TO B6
+SUM FP for "OCTXL"$NFSC TO B7
+SUM FP for "OC7GPR"$NFSC TO B8
+SUM FP for "OC7RSN"$NFSC TO B9
+SUM FP  for "OC7TAX"$NFSC TO B10
+
+?A1,A2,A3,A4
+WAIT
+C=(B1+B2+B3+B4)
+D=(B6+B7+B8+B9)
+J=C*100/D
+sum fo FOR "T01 "$NFSC to c1
+sum fo FOR "T04 "$NFSC to c2
+TT=c1*100/c2
+cc=b5*100/b10
+SET PRINTER ON
+?"        PERIOD FOR WHICH AVERAGE EFFICIENCY CALCULATED:",D1,"TO",D2
+?""
+? "            ALL FIGURES PERTAIN TO DAY BUSY HOUR :11-00 TO 12-00"
+? " "    
+? "                                EFFICIENT CALLS               PROCESSED CALLS     EFF"
+?""
+? "LOCAL CALL INTERNAL EFF:",int(c1/a1),int(c2/a1),INT(tt)
+?""
+? "JUNCTION CALL  EFF     :",int(c/a1),int(d/a1),INT(j)
+?""
+? "STD CALL  EFF          :",int(b5/a1),int(b10/a1),INT(cc)
+?""
+?""
+?""
+?""
+SET PRINTER OFF
+EJECT
+CLOS ALL
+SET SAFE ON

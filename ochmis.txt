@@ -1,0 +1,155 @@
+*AVERAGE JUNCTION CALLS
+clea
+d1="03-01-26"
+@5,13 say "Enter date for which MIS is to be prepared " get d1 
+read
+use ms2
+zap
+*appe from ochhst01 for ("12"$time).and."01-11-26"$date
+appe from OCHHST for ("12"$time).and."&d1"$date
+
+*count for "OATX1"$NFSC TO A1
+*count for "OCTXL"$NFSC TO A2
+*count for "OC7GPR"$NFSC TO A3
+*count for "OC7RSN"$NFSC TO A4
+*count for "OC7TAX"$NFSC TO A5
+
+*SUM FE for "OATX1"$NFSC TO B1
+*UM FE for "OCTXL"$NFSC TO B2
+*SUM FE for "OC7GPR"$NFSC TO B3
+*UM FE for "OC7RSN"$NFSC TO B4
+*SUM FE for "OC7TAX"$NFSC TO B5
+
+*SUM FP for "OATX1"$NFSC TO B6
+*SUM FP for "OCTXL"$NFSC TO B7
+*SUM FP for "OC7GPR"$NFSC TO B8
+*SUM FP for "OC7RSN"$NFSC TO B9
+*SUM FP  for "OC7TAX"$NFSC TO B10
+
+*?A1,A2,A3,A4
+*WAIT
+*C=(B1+B2+B3+B4)
+*D=(B6+B7+B8+B9+B10)
+
+*J=C/D
+
+*?"% AVERAGE JUNCTION CALL=",J
+*DATE WISE JUNCTION CALLS EFFICIENCY
+*GO TOP
+*DO WHILE.NOT.EOF()
+D=DATE
+dd=substr(date,7,2)+substr(date,4,2)+substr(date,1,2)
+T=TIME
+
+X=RECNO()
+SUM FE TO Q1 FOR ("OATX"$NFSC.OR."OCTXL"$NFSC.OR."OC7GPR"$NFSC.OR."OC7RSN"$NFSC).AND."&D"$DATE
+SUM FP TO Q2 FOR ("OATX"$NFSC.OR."OCTXL"$NFSC.OR."OC7GPR"$NFSC.OR."OC7RSN"$NFSC).AND."&D"$DATE
+SUM FE TO Q3 FOR "OC7TAX"$NFSC.AND."&D"$DATE
+SUM FP TO Q4 FOR "OC7TAX"$NFSC.AND."&D"$DATE
+LOCA FOR "T01 "$NFSC
+TT1=Fo
+LOCA FOR "T04 "$NFSC
+TT2=FO
+TT=TT1*100/TT2
+
+
+Q=Q1*100/Q2
+QQ=Q3*100/Q4
+SET PRINTER ON
+?"               BHARAT SANCHAR NIGAM LIMITED" 
+?""
+?""
+?""
+?""
+?"  To:                                            From:"
+?"     SDE MIS                                          SDE OCB LOCAL"
+?"     GMTD                                             CTX,"
+?"     Bhopal                                           Bhopal"
+?""
+?""
+?""
+?""
+
+
+?"     Letter No.SDE/OCB/LOCAL/MIS/2002-03/12             Dated:26-03-2003"
+?"     ______________________________________________________________________"
+?""
+?""
+?"    Sub: MIS Report of OCB Local Exchange for the month of March-2003."
+?""
+?""
+?""
+?""
+
+?"    Type of call    Traffic Effective      Traffic Offered        Efficiency            "
+?"_____________________________________________________________________________"
+?""
+?""
+?""
+?""
+
+?"LOCAL CALLS   ",int(TT1),"          ",int(TT2),"   ",ROUND(TT,2)
+?""
+?"STD CALLS     ",int(Q3),"           ",int(Q4),"   ",ROUND(QQ,2)
+?""
+?"JUNCTION CALLS",int(Q1),"           ",int(Q2),"   ",ROUND(Q,2)
+
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?"                                                          SDE OCB LOCAL"
+?"                                                               CTX"
+?"                                                              BHOPAL."
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?""
+?"  ****** FOR THE KIND ATTENTION OF Mr.Patel,SDE MIS.*********"
+
+
+eject
+
+SET PRINTER OFF
+*GOTO X
+*DO WHIL "&D"$DATE
+*SKIP
+*ENDDO
+*IF.NOT.EOF()
+*SKIP
+*ELSE
+*EXIT
+*ENDIF
+*ENDDO
+
+
+CLOS ALL
+
+*?"% Local JUNCTION   CALL=",J
+*?"% STD              CALL=",q3/q4
+*?"% AVERAGE JUNCTION CALL=",q1/q2

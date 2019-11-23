@@ -1,0 +1,118 @@
+SET TALK OFF
+CLEA
+ddf=space(20)
+dda=space(2)
+A="        "
+B="12 H 00"
+C="   "
+D="  "
+STORE DATE()-1 TO D1
+MM=SUBSTR(DTOC(D1),1,2)
+DD=SUBSTR(DTOC(D1),4,2)
+YY=SUBSTR(DTOC(D1),7,2)
+A="&YY-&MM-&DD"
+@  5,25 say " OCHLA PRINTOUT " font "arial",14 color w+/b+
+@  8,11 to 15,60 double
+@ 10,13 SAY "ENTER DATE (YY-MM-DD)           " GET A 
+@ 11,13 SAY "ENTER TIME (12 H  )             " GET B
+@ 12,13 SAY "ENTER REJECTION GREATER THAN    " GET C
+@ 13,13 SAY  "ENTER AVAILIBILITY GREATER THAN " GET D
+READ
+
+USE MS2
+DELE ALL
+PACK
+
+APPE FROM OCHHST FOR "&A"$DATE.AND."&B"$TIME
+
+ERASE F33.DBF
+SORT ON NFSC TO F33
+USE F33
+
+LOCA FOR "T01"$NFSC
+T01=FR   
+LOCA FOR "T06"$NFSC
+T06=FR 
+LOCA FOR "CC "$NFSC
+TRA=FO
+EFF=T01*100/T06
+GO TOP
+A=DATE
+DELE
+PACK
+B=TIME
+*DELE ALL FOR "            "$STATION
+*PACK
+set talk on
+SET PRINT ON
+?
+?
+?
+? "                 OCHLA REPORT OF OCB LOCAL BHOPAL TELECOM "
+? "                 DATED:"+A
+? "                 TIME :"+B+"HRS"
+? "                 OVERALL EFFICIENCY:",EFF
+? "                 T01  :",T01
+? "                 T06  :",T06 
+? "                 TOTAL TRAFFIC:",TRA
+?
+? "                                                        "   
+? "CLASS Z"
+? "-------"
+LIST TO PRINT OFF NFSC,FO,REM FOR "Z"$CL
+
+? "CLASS C"
+? "-------"
+LIST TO PRINT OFF NFSC,REM,FO FOR "C"$CL
+
+? "CLASS F"
+? "-------"
+LIST NFSC,FE,FP,FR,FO,FS,FQ,CCR OFF FOR FR>=VAL(C).AND.AVL>=VAL(D).AND." "$CL
+
+? "CLASS A"
+? "-------"
+LIST TO PRINT OFF NFSC,FO,REM FOR "A"$CL
+
+? "CLASS R"
+? "-------"
+LIST TO PRINT OFF NFSC,ALLTRIM(REM),RPA,RRA,RAA,RPD,RRD,RAD FOR "R"$CL
+
+? "CLASS T"
+? "-------"
+? "EFFICIENT CALLS"
+?"-----------------"
+?"        LOCAL O/G   I/C   TRANSIT    REASON"
+SET HEAD OFF
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND."T08">NFSC
+?"CALLS UNSUCCESSFUL DUE TO CALLING PARTY"
+?"------------------------------------------"
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND."T20">NFSC.AND.NFSC>"T12 "
+?"CALLS UNSUCCESSFUL DUE TO CALLED PARTY"
+?"------------------------------------------"
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND."T20"<NFSC.AND.NFSC<"T25 "
+?"CALLS UNSUCCESSFUL DUE TO EXCHANGE"
+?"------------------------------------------"
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND."T30"<NFSC.AND.NFSC<"T40 "
+?"CALLS UNSUCCESSFUL DUE TO FOWARD SYSTEM"
+?"------------------------------------------"
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND."T40"<NFSC.AND.NFSC<"T52 "
+?"CALLS UNSUCCESSFUL DUE TO MACKWARD SYSTEM"
+?"------------------------------------------"
+LIST TO PRINT OFF NFSC,fo,FE,FP,FR,ALLTRIM(REM) FOR "T"$CL.AND.NFSC>"T52 "
+
+
+
+
+? "CLASS H"
+? "-------"
+LIST TO PRINT OFF NFSC,FO FOR "H"$CL
+eject
+
+
+**LIST NFSC,FE,FP,FR,FO,FS,FQ,CCR OFF FOR FR>=VAL(C).AND.AVL>=VAL(D)
+*COPY FIELDS DATE,TIME,STATION,NFSC,LEVEL,FE,FP,FR,FO,FS,FQ,CCR  FOR FR>=VAL(C).AND.AVL>=VAL(D) TO A:\OCHLA  
+SET PRINT OFF
+eject
+set talk off
+CLOSE ALL
+clear
